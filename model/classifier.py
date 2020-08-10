@@ -10,4 +10,4 @@ class Classifier(nn.Module):
 
     def forward(self, input):
         x = self.gated_MLP(input)
-        return torch.sigmoid(self.linear(x))
+        return self.linear(x)
