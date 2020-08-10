@@ -12,7 +12,7 @@ class VQAModel(nn.Module):
 		self.v_dim = v_dim
 		self.embeddings = nn.Embedding(num_embeddings, embed_dim, padding_idx=0)
 		# self.embeddings = WordEmbedding('data', 0)
-		self.encoder = Encoder(embed_dim, q_dim, 1, 0.2)
+		self.encoder = Encoder(embed_dim, q_dim, 2, 0.2)
 		self.top_down_att = TopDownAttention(v_dim, q_dim, common_dim)
 		# self.v_proj = MLP(v_dim,common_dim)
 		# self.q_proj = MLP(q_dim, common_dim)
@@ -37,6 +37,11 @@ class VQAModel(nn.Module):
 		pred = self.classifier(joint_repr)
 		return pred
 
+	def grad_params(self):
+		for p in self.parameters():
+			if p.requires_grad:
+				yield p
+
 if __name__ == '__main__':
 	from dataset import Dataset
 	dataset = Dataset('', 'train')
@@ -47,6 +52,7 @@ if __name__ == '__main__':
 	# print(model.forward(q, q_len, f, obs))
 	for f, bb, spat, obs, a, q, q_len, qid in test_loader:
 
+		# print(torch.narrow(f, 1, 0, obs))
 		v = model.forward(q,q_len, f,obs)
 		print(v.size())
 		break

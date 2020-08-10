@@ -10,11 +10,13 @@ class TopDownAttention(nn.Module):
         self.gated_MLP = GatedMLP(v_dim+q_dim, hidden_dim, bias=True)
         self.dropout = nn.Dropout(dropout_p)
     def forward(self, v, q, n_objs):
+        # v = torch.narrow(v, 1, 0, n_objs)
         b,k,_ = v.size()
         q = q.unsqueeze(1).repeat(1,k,1)
         v_q = torch.cat((v, q),2)
         f_a = self.gated_MLP(v_q)
         att = self.attention_weights(f_a)
+        att = F.softmax(att, dim=1)
         return att
 
 class GatedMLP(nn.Module):
